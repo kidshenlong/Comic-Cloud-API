@@ -1,0 +1,22 @@
+{
+  "type_other": "mysql",
+  "type": "postgres",
+  "host": "localhost",
+  "port_other": 3306,
+  "port": 5432,
+  "username_other": "root",
+  "username": "postgres",
+  "password": "password",
+  "database": "cc_db",
+  "synchronize": true,
+  "logging": false,
+  "entities": [
+    "src/entity/**/*.ts"
+  ],
+  "migrations": [
+    "src/migration/**/*.ts"
+  ],
+  "subscribers": [
+    "src/subscriber/**/*.ts"
+  ]
+}

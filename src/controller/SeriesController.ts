@@ -11,7 +11,7 @@ export class SeriesController {
     }
 
     @Get("/series/:id")
-    getOne(@Param("id") id: number): Promise<Series> {
+    getOne(@Param("id") id: string): Promise<Series> {
         return Series.findOneById(id);
     }
 
@@ -21,12 +21,12 @@ export class SeriesController {
     }
 
     @Put("/series/:id")
-    put(@Param("id") id: number, @Body() user: any) {
+    put(@Param("id") id: string, @Body() user: any) {
         return "Updating a user...";
     }
 
     @Delete("/series/:id")
-    remove(@Param("id") id: number) {
+    remove(@Param("id") id: string) {
         return "Removing user...";
     }
 

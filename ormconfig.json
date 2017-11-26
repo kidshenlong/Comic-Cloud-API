@@ -7,7 +7,8 @@
   "username_other": "root",
   "username": "postgres",
   "password": "password",
-  "database": "cc_db",
+  "database_other": "cc_db",
+  "database": "postgres",
   "synchronize": true,
   "logging": false,
   "entities": [

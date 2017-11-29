@@ -118,7 +118,7 @@ createConnection().then(async connection => {
                         redirectUris: [],//[client.redirect_uri],
                         grants: ['password']
                     }
-                }).catch(undefined);
+                })
         },
         saveToken: async (token: OAuth2Server.Token, client: OAuth2Server.Client, user: OAuth2Server.User): Promise<OAuth2Server.Token> => {
             //'INSERT INTO oauth_tokens(access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id) VALUES ($1, $2, $3, $4)'
@@ -180,15 +180,18 @@ createConnection().then(async connection => {
 
     const oauth2PasswordModel: OAuth2Server.PasswordModel = {
         getUser: async (username: string, password: string): Promise<OAuth2Server.User | OAuth2Server.Falsey> => {
-            return Users.findOne({username: username, password: password})
+            console.log("*************** called 1");
+            /*return Users.findOne({username: username, password: password})
                 .then((user) => {
                     return {id: user.id}
-                });
+                });*/
+            return {id: "0af9c36e-d218-11e7-862d-0242ac110003"}
         },
         getClient: async (clientId: string, clientSecret: string): Promise<OAuth2Server.Client | OAuth2Server.Falsey> => {
+            console.log("*************** called 2");
             //'SELECT client_id, client_secret, redirect_uri FROM oauth_clients WHERE client_id = $1 AND client_secret = $2'
             //console.log(clientId + " " + clientSecret);
-            return await OauthClients.findOne({client_id: clientId, client_secret: clientSecret})
+            /*return await OauthClients.findOne({client_id: clientId, client_secret: clientSecret})
             //return await OauthClients.findOne({client_id: clientId})
                 .then( (client) => {
                     return {
@@ -196,11 +199,17 @@ createConnection().then(async connection => {
                         //redirectUris: [],//[client.redirect_uri],
                         grants: ['password']// todo: db call for related grants
                     }
-                }).catch(undefined);
+                }).catch(undefined);*/
+            return {
+                id: "lolz",
+                grants: ['password']
+            }
         },
         saveToken: async (token: OAuth2Server.Token, client: OAuth2Server.Client, user: OAuth2Server.User): Promise<OAuth2Server.Token> => {
             //'INSERT INTO oauth_tokens(access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id) VALUES ($1, $2, $3, $4)'
             let oauthToken = new OauthTokens();
+            console.log("*************** called 3");
+
 
             return Users.findOneById(user.id).then((user) => {
                 oauthToken.access_token = token.accessToken;
@@ -209,13 +218,23 @@ createConnection().then(async connection => {
                 oauthToken.refresh_token = token.refreshToken;
                 oauthToken.refresh_token_expires_on = token.refreshTokenExpiresAt;
                 oauthToken.user = user;
-                return oauthToken.save().then(() => token);
+
+                return oauthToken.save().then(() => {
+                    token.user = user;
+                    token.client = client;
+
+                    console.log("passwed in version");
+                    console.log(token);
+                    return token;
+                });
 
             });
         },
         getAccessToken: async (accessToken: string): Promise<OAuth2Server.Token> => {
             //'SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id FROM oauth_tokens WHERE access_token = $1'
-            console.log(accessToken);
+            //console.log(accessToken);
+            console.log("*************** called 4");
+
             return OauthTokens.findOne({access_token: accessToken}).then((token) => {
                 return Users.findOneById(token.user.id).then((user) => {
                     return {
@@ -228,12 +247,15 @@ createConnection().then(async connection => {
             })
         },
         verifyScope: async (token: OAuth2Server.Token, scope: string): Promise<boolean> => {
+            console.log("*************** called 6");
+
             return true;
         },
     };
 
     const oauth2Server = new OAuth2Server({
-        model: oauth2PasswordModel
+         model: oauth2PasswordModel
+        //model: oauth2AuthroizationCodeModel
     });
 
 
@@ -242,7 +264,7 @@ createConnection().then(async connection => {
         const request = new OAuth2Server.Request(req);
         const response = new OAuth2Server.Response(res);
 
-        console.log(request.body);
+        //console.log(request.body);
 
         oauth2Server.token(request, response)
             .then((success: OAuth2Server.Token) => {
